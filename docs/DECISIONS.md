@@ -1,6 +1,6 @@
 # ADR — Architecture Decision Records
 
-Registro cronológico das decisões arquiteturais do Finkin Bank.
+Registro cronológico das decisões arquiteturais do Finkin.
 Formato: **ADR-NNN | Data | Status | Título**
 
 ---

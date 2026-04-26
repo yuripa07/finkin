@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
- * Ponto de entrada do Finkin Bank.
+ * Ponto de entrada do Finkin.
  *
  * @EnableJpaAuditing — ativa @CreatedDate, @LastModifiedDate, @CreatedBy nas entidades JPA.
  *   A implementação de AuditorAware<String> está em AuditConfig.

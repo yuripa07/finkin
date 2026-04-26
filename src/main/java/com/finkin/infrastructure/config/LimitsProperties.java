@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 /**
- * Limites operacionais do Finkin Bank.
+ * Limites operacionais do Finkin.
  * Baseados na Resolução BCB nº 1/2020 que instituiu o Pix e definiu
  * limites diferenciados para períodos diurno (06h–20h) e noturno (20h–06h).
  */

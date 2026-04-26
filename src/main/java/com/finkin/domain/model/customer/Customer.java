@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 /**
- * Entidade de domínio que representa um titular (Pessoa Física) do Finkin Bank.
+ * Entidade de domínio que representa um titular (Pessoa Física) do Finkin.
  *
  * Deliberadamente sem anotações JPA — o domínio não conhece o mecanismo de
  * persistência. A conversão para/de JPA Entity é responsabilidade dos adapters

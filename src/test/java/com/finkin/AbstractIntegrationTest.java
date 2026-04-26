@@ -18,7 +18,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Base para todos os testes de integração do Finkin Bank.
+ * Base para todos os testes de integração do Finkin.
  *
  * Pattern: Singleton container — Postgres e Redis são iniciados uma vez por JVM
  * e compartilhados entre todas as classes de teste, reduzindo tempo de setup.

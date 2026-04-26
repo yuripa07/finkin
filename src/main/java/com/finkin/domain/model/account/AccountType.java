@@ -1,7 +1,7 @@
 package com.finkin.domain.model.account;
 
 /**
- * Tipos de conta suportados pelo Finkin Bank.
+ * Tipos de conta suportados pelo Finkin.
  * Baseado na Resolução CMN nº 4.753/2019 e na Resolução BCB nº 80/2021
  * que definem as modalidades de contas para pessoa física.
  */

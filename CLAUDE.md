@@ -1,4 +1,4 @@
-# Finkin Bank — Instruções para Claude Code
+# Finkin — Instruções para Claude Code
 
 > Leia também `AGENTS.md` — este arquivo adiciona apenas instruções específicas do Claude Code.
 

@@ -59,10 +59,10 @@ springdoc:
 # ═══════════════════════════════════════════════════════════
 finkin:
   bank:
-    # ISPB fictício do Finkin Bank (Resolução BCB nº 6/2020 define o formato ISPB real)
+    # ISPB fictício do Finkin (Resolução BCB nº 6/2020 define o formato ISPB real)
     ispb: "99999999"
     agency: "0001"
-    name: "Finkin Bank"
+    name: "Finkin"
 
   limits:
     # Limite diário de transferência — Resolução BCB nº 1/2020 (Pix)

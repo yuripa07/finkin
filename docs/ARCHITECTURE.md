@@ -1,4 +1,4 @@
-# Arquitetura do Finkin Bank
+# Arquitetura do Finkin
 
 ## Padrão: Hexagonal (Ports & Adapters)
 

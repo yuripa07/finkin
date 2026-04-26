@@ -1,4 +1,4 @@
-# Changelog — Histórico de Evolução do Finkin Bank
+# Changelog — Histórico de Evolução do Finkin
 
 Formato de ondas de implementação. Cada onda é um marco funcional testável.
 

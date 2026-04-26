@@ -1,7 +1,7 @@
 package com.finkin.shared;
 
 /**
- * Constantes globais do Finkin Bank.
+ * Constantes globais do Finkin.
  * Todas as constantes que referenciam normas do Banco Central incluem
  * a citação da resolução para rastreabilidade regulatória.
  */

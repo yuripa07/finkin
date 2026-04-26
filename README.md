@@ -1,15 +1,21 @@
-# Finkin Bank — Backend Fase 1
+# Finkin
 
-> Banco digital simulado para PDI em Open Finance Brasil.
-> Todos os dados e transações são fictícios — sem dinheiro real.
+> **Fin** (finance) + **kin** (金 — ouro em japonês)
 
-## O que é
+API REST que simula um banco digital brasileiro, com regras de negócio reais baseadas nas normas do Banco Central do Brasil. Projeto de PDI para aprendizado de Java moderno, Spring Boot 4 e Open Finance.
 
-Finkin Bank é uma API REST que simula um banco digital brasileiro, implementando
-regras de negócio reais conforme as normas do Banco Central do Brasil (BCB).
-Projeto de PDI para aprendizado de Java moderno, Spring Boot 4 e Open Finance.
+Todos os dados e transações são fictícios — sem dinheiro real.
 
-Nome: **Fin** (finance) + **kin** (金 — ouro/dinheiro em japonês)
+## O que o app faz
+
+- Cadastro e autenticação de clientes via JWT
+- Abertura de contas corrente e poupança
+- Transferências internas com idempotência (Idempotency-Key)
+- Pix por chave (CPF, e-mail, telefone, aleatória)
+- Limites operacionais por horário, conforme Resolução BCB nº 1/2020
+- Extrato paginado e comprovante de transação
+- Soft delete em clientes e contas
+- Auditoria automática de criação/atualização via Spring Data
 
 ## Stack
 
@@ -26,13 +32,10 @@ Nome: **Fin** (finance) + **kin** (金 — ouro/dinheiro em japonês)
 ## Pré-requisitos
 
 ```bash
-# 1. Instalar Java 25 via SDKMAN
+# Java 25 via SDKMAN
 sdk install java 25-open
 
-# 2. Verificar
-java --version  # deve mostrar 25.x
-
-# 3. Docker (Postgres + Redis)
+# Docker (Postgres + Redis)
 docker --version  # 24+ recomendado
 ```
 
@@ -42,30 +45,30 @@ docker --version  # 24+ recomendado
 # 1. Subir dependências
 docker compose up -d
 
-# 2. Rodar a aplicação (profile dev — migrations automáticas + seed)
+# 2. Rodar (profile dev — migrations automáticas + seed)
 ./mvnw spring-boot:run
 
-# A API sobe em: http://localhost:8080
-# Swagger UI:    http://localhost:8080/swagger-ui.html
-# Health:        http://localhost:8080/actuator/health
+# API:        http://localhost:8080
+# Swagger UI: http://localhost:8080/swagger-ui.html
+# Health:     http://localhost:8080/actuator/health
 ```
 
 ## Testes
 
 ```bash
-# Testes unitários (rápidos, sem Docker)
+# Unitários (sem Docker)
 ./mvnw test
 
-# Build completo (unit + integração — requer Docker)
+# Build completo com integração (requer Docker)
 ./mvnw verify
 ```
 
-## Endpoints (fase 1)
+## Endpoints principais
 
-### Autenticação (público)
+### Autenticação
 
 ```bash
-# Registrar novo customer
+# Registrar
 curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{
@@ -77,68 +80,58 @@ curl -X POST http://localhost:8080/auth/register \
     "password": "Senha123"
   }'
 
-# Login — retorna JWT
+# Login → retorna JWT
 curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "joao@email.com", "password": "Senha123"}'
 ```
 
-### Conta (autenticado)
+### Conta
 
 ```bash
 TOKEN="<jwt do login>"
 
-# Abrir conta corrente
+# Abrir conta
 curl -X POST http://localhost:8080/accounts \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"type": "CORRENTE"}'
 
-# Consultar saldo
+# Saldo
 curl http://localhost:8080/accounts/{id}/balance \
   -H "Authorization: Bearer $TOKEN"
 
-# Extrato paginado (padrão: 20 itens, mais recente primeiro)
+# Extrato
 curl "http://localhost:8080/accounts/{id}/statement?page=0&size=10" \
   -H "Authorization: Bearer $TOKEN"
 
-# Registrar chave Pix (CPF, EMAIL, PHONE, RANDOM)
+# Registrar chave Pix
 curl -X POST http://localhost:8080/accounts/{id}/pix-keys \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"keyType": "EMAIL", "keyValue": "joao@email.com"}'
 ```
 
-### Transferência (com Idempotency-Key)
+### Transferência
 
 ```bash
-# Gerar uma chave UUID v4 para idempotência
 IDEM=$(uuidgen)
 
-# Transferência interna
 curl -X POST http://localhost:8080/transfers \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $IDEM" \
   -H "Content-Type: application/json" \
   -d '{
-    "sourceAccountId": "<uuid da conta de origem>",
-    "targetAccountId": "<uuid da conta de destino>",
+    "sourceAccountId": "<uuid>",
+    "targetAccountId": "<uuid>",
     "amount": 100.00,
     "description": "Pagamento"
   }'
-
-# Reenviar com o mesmo IDEM → retorna a mesma resposta (idempotência)
-curl -X POST http://localhost:8080/transfers \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Idempotency-Key: $IDEM" \
-  -H "Content-Type: application/json" \
-  -d '{...mesmo body...}'
 ```
 
 ### Pix
 
 ```bash
-# Envio de Pix por chave
 curl -X POST http://localhost:8080/pix/send \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $(uuidgen)" \
@@ -157,7 +150,7 @@ curl http://localhost:8080/pix/transactions/{id}/receipt \
 
 ## Usuários de seed (dev)
 
-| Customer | CPF | Email | Senha | Saldo |
+| Cliente | CPF | Email | Senha | Saldo |
 |---|---|---|---|---|
 | Alice Financeira | 529.982.247-25 | alice@finkin.dev | Alice123 | R$ 10.000 |
 | Bob Desenvolvedor | 111.444.777-35 | bob@finkin.dev | Bob12345 | R$ 5.000 |
@@ -167,45 +160,21 @@ curl http://localhost:8080/pix/transactions/{id}/receipt \
 ```
 com.finkin
 ├── domain/          ← Regras de negócio puras (sem Spring, sem JPA)
-│   ├── model/       ← Entidades (Customer, Account, Transaction) + VOs (Cpf, Money, AccountNumber...)
-│   ├── port/in/     ← Use case interfaces (RegisterCustomer, OpenAccount, SendPix...)
-│   ├── port/out/    ← Repository + external interfaces (CustomerRepository, IdempotencyStore...)
+│   ├── model/       ← Entidades + Value Objects (Cpf, Money, AccountNumber...)
+│   ├── port/in/     ← Use case interfaces
+│   ├── port/out/    ← Repository + interfaces externas
 │   └── exception/   ← DomainException e subclasses
 ├── application/     ← Orquestra casos de uso
 │   └── service/     ← RegisterCustomerService, OpenAccountService, SendPixService...
-├── infrastructure/  ← Adapters que conectam ao mundo externo
+├── infrastructure/  ← Adapters
 │   ├── adapter/in/web/   ← Controllers REST + DTOs + filtros HTTP
 │   ├── adapter/out/      ← JPA, Redis, mock SPI
 │   └── config/           ← SecurityConfig, OpenApiConfig, RedisConfig...
-├── shared/          ← BankConstants (ISPB, horários BCB)
-└── stubs/           ← Pacotes vazios para fase 2 (card, boleto, investment...)
+└── shared/          ← BankConstants (ISPB, horários BCB)
 ```
 
-## Mapa: Pattern → Código
+## Decisões arquiteturais
 
-| Pattern | Onde | Por quê |
-|---|---|---|
-| Factory | `OpenAccountService` | Encapsula geração de número de conta e defaults |
-| Builder | `@Builder` em Customer/Account/Transaction | Construção fluente com muitos campos |
-| Strategy | `LimitPolicy`, `DaytimeLimit`, `NighttimeLimit` | Limite diário muda por horário (BCB Art. 20) |
-| Chain of Responsibility | `TransactionValidator` e subclasses | Validações independentes e compostas antes de debitar |
-| Observer/Event | `TransactionCompletedEvent` + `SpringDomainEventPublisher` | Desacopla transferência de notificações futuras |
-| Adapter | `SpiClientMockAdapter` → `ExternalPixGateway` | Fase 1: mock; Fase 2: troca por HTTP real sem mudar domínio |
-| Facade | `BankingFacade` (futuro) | Simplificar chamadas complexas nos controllers |
-
-## Mapa: Regulação BCB → Implementação
-
-| Norma BCB | Implementação |
-|---|---|
-| Resolução nº 1/2020, Art. 20 — limites Pix noturno | `LimitsProperties.transferNightBrl`, `NighttimeLimit`, `DailyLimitValidator` |
-| Resolução nº 1/2020 — horário noturno 20h–6h | `LimitPolicySelector`, `BankConstants.NIGHT_HOUR_START/END` |
-| Resolução nº 6/2020 — ISPB de 8 dígitos | `BankConstants.ISPB = "99999999"` (fictício) |
-| Manual de Tempos do Pix — formato endToEndId | `EndToEndId.generate()` — 32 chars, prefixo E+ISPB+datetime |
-| LGPD Art. 46 — segurança dos dados pessoais | `MaskingConverter` — CPF mascarado em todos os logs |
-
-## Roadmap
-
-- Fase 2: Pix externo real (SPI), cartão, boleto, Open Finance/consentimento
-- Ver: [docs/BACKLOG.md](docs/BACKLOG.md)
-- Decisões arquiteturais: [docs/DECISIONS.md](docs/DECISIONS.md)
-- Histórico de mudanças: [docs/CHANGELOG.md](docs/CHANGELOG.md)
+- [docs/DECISIONS.md](docs/DECISIONS.md) — ADRs
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — visão geral da arquitetura
+- [docs/CHANGELOG.md](docs/CHANGELOG.md) — histórico de mudanças

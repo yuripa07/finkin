@@ -1,4 +1,4 @@
-# Finkin Bank — Guia para Agentes IA
+# Finkin — Guia para Agentes IA
 
 > Este arquivo é o ponto de entrada para qualquer agente IA (Claude Code, OpenAI Codex,
 > Google Gemini CLI, etc.) que trabalhe neste repositório. Leia-o completamente antes
@@ -6,7 +6,7 @@
 
 ## O que é este projeto
 
-**Finkin Bank** é um banco digital simulado para PDI (Plano de Desenvolvimento Individual)
+**Finkin** é um banco digital simulado para PDI (Plano de Desenvolvimento Individual)
 focado em Open Finance Brasil. Todos os dados e transações são fictícios. As regras de
 negócio seguem as normas do Banco Central do Brasil (BCB) como se fosse um banco real.
 

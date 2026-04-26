@@ -19,10 +19,10 @@ public class OpenApiConfig {
 
         return new OpenAPI()
             .info(new Info()
-                .title("Finkin Bank API")
+                .title("Finkin API")
                 .version("1.0.0-fase1")
                 .description("""
-                    API do Finkin Bank — banco digital simulado para PDI em Open Finance Brasil.
+                    API do Finkin — banco digital simulado para PDI em Open Finance Brasil.
 
                     Todas as transações são fictícias. As regras de negócio seguem as normas do
                     Banco Central do Brasil (BCB), incluindo:
