@@ -1,11 +1,12 @@
 package com.finkin.application.service.account;
+import com.finkin.domain.model.account.enums.*;
 
 import com.finkin.domain.exception.CustomerNotFoundException;
 import com.finkin.domain.exception.KycNotApprovedException;
 import com.finkin.domain.model.account.*;
-import com.finkin.domain.port.in.IOpenAccountUseCase;
-import com.finkin.domain.port.out.IAccountRepository;
-import com.finkin.domain.port.out.ICustomerRepository;
+import com.finkin.domain.port.input.IOpenAccountUseCase;
+import com.finkin.domain.port.output.IAccountRepository;
+import com.finkin.domain.port.output.ICustomerRepository;
 import com.finkin.infrastructure.config.LimitsProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public class OpenAccountService implements IOpenAccountUseCase {
             .agency("0001")
             .number(numberGenerator.generate())
             .type(command.type())
-            .status(AccountStatus.ATIVA)
+            .status(AccountStatusEnum.ATIVA)
             .balance(MoneyModel.zero())
             .dailyLimitDay(limitsProperties.getTransferDayBrl())
             .dailyLimitNight(limitsProperties.getTransferNightBrl())

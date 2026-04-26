@@ -2,10 +2,10 @@ package com.finkin.application.service.pix;
 
 import com.finkin.domain.exception.AccountNotFoundException;
 import com.finkin.domain.model.pix.PixKeyModel;
-import com.finkin.domain.model.pix.PixKeyType;
-import com.finkin.domain.port.in.IRegisterPixKeyUseCase;
-import com.finkin.domain.port.out.IAccountRepository;
-import com.finkin.domain.port.out.IPixKeyRepository;
+import com.finkin.domain.model.pix.enums.PixKeyTypeEnum;
+import com.finkin.domain.port.input.IRegisterPixKeyUseCase;
+import com.finkin.domain.port.output.IAccountRepository;
+import com.finkin.domain.port.output.IPixKeyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class RegisterPixKeyService implements IRegisterPixKeyUseCase {
         accountRepository.findById(command.accountId())
             .orElseThrow(() -> new AccountNotFoundException(command.accountId()));
 
-        PixKeyModel key = command.keyType() == PixKeyType.RANDOM
+        PixKeyModel key = command.keyType() == PixKeyTypeEnum.RANDOM
             ? PixKeyModel.createRandom(command.accountId())
             : PixKeyModel.create(command.accountId(), command.keyType(), command.keyValue());
 

@@ -1,4 +1,5 @@
 package com.finkin.domain.model.pix;
+import com.finkin.domain.model.pix.enums.PixKeyTypeEnum;
 
 import com.finkin.domain.exception.InvalidPixKeyException;
 import com.finkin.domain.model.customer.CpfModel;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Entidade de domínio que representa uma chave Pix registrada.
  *
- * Cada chave pertence a uma conta (accountId) e tem um tipo (PixKeyType).
+ * Cada chave pertence a uma conta (accountId) e tem um tipo (PixKeyTypeEnum).
  * A validação do valor da chave é específica por tipo:
  *   - CPF: mesmo algoritmo do CustomerModel.CpfModel
  *   - EMAIL: mesmo algoritmo do CustomerModel.EmailModel
@@ -30,7 +31,7 @@ public class PixKeyModel {
 
     private final UUID id;
     private final UUID accountId;
-    private final PixKeyType keyType;
+    private final PixKeyTypeEnum keyType;
     private final String keyValue;
     private final ZonedDateTime createdAt;
 
@@ -38,7 +39,7 @@ public class PixKeyModel {
      * Factory que cria e valida uma PixKeyModel de acordo com seu tipo.
      * Lança InvalidPixKeyException se o valor não for válido para o tipo informado.
      */
-    public static PixKeyModel create(UUID accountId, PixKeyType keyType, String rawValue) {
+    public static PixKeyModel create(UUID accountId, PixKeyTypeEnum keyType, String rawValue) {
         String validated = validate(keyType, rawValue);
         return PixKeyModel.builder()
             .id(UUID.randomUUID())
@@ -54,13 +55,13 @@ public class PixKeyModel {
         return PixKeyModel.builder()
             .id(UUID.randomUUID())
             .accountId(accountId)
-            .keyType(PixKeyType.RANDOM)
+            .keyType(PixKeyTypeEnum.RANDOM)
             .keyValue(UUID.randomUUID().toString())
             .createdAt(ZonedDateTime.now())
             .build();
     }
 
-    private static String validate(PixKeyType type, String raw) {
+    private static String validate(PixKeyTypeEnum type, String raw) {
         if (raw == null || raw.isBlank()) {
             throw new InvalidPixKeyException(type.name(), raw);
         }

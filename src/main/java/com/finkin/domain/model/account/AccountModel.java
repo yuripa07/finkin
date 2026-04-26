@@ -1,4 +1,6 @@
 package com.finkin.domain.model.account;
+import com.finkin.domain.model.account.enums.AccountStatusEnum;
+import com.finkin.domain.model.account.enums.AccountTypeEnum;
 
 import com.finkin.domain.exception.AccountBlockedException;
 import com.finkin.domain.exception.InsufficientBalanceException;
@@ -27,9 +29,9 @@ public class AccountModel {
     private final UUID customerId;
     private final String agency;
     private final AccountNumberModel number;
-    private final AccountType type;
+    private final AccountTypeEnum type;
 
-    private AccountStatus status;
+    private AccountStatusEnum status;
     private MoneyModel balance;
 
     /**
@@ -71,11 +73,11 @@ public class AccountModel {
     }
 
     public boolean canDebit() {
-        return AccountStatus.ATIVA.equals(status);
+        return AccountStatusEnum.ATIVA.equals(status);
     }
 
     private void assertActive() {
-        if (!AccountStatus.ATIVA.equals(status)) {
+        if (!AccountStatusEnum.ATIVA.equals(status)) {
             throw new AccountBlockedException(id);
         }
     }
@@ -83,7 +85,7 @@ public class AccountModel {
     public void softDelete() {
         this.deletedAt = ZonedDateTime.now();
         this.updatedAt = ZonedDateTime.now();
-        this.status = AccountStatus.ENCERRADA;
+        this.status = AccountStatusEnum.ENCERRADA;
     }
 
     public boolean isDeleted() {

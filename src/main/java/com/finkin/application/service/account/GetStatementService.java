@@ -2,9 +2,9 @@ package com.finkin.application.service.account;
 
 import com.finkin.domain.exception.AccountNotFoundException;
 import com.finkin.domain.model.transaction.TransactionModel;
-import com.finkin.domain.port.in.IGetStatementUseCase;
-import com.finkin.domain.port.out.IAccountRepository;
-import com.finkin.domain.port.out.ITransactionRepository;
+import com.finkin.domain.port.input.IGetStatementUseCase;
+import com.finkin.domain.port.output.IAccountRepository;
+import com.finkin.domain.port.output.ITransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

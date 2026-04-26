@@ -2,8 +2,8 @@ package com.finkin.application.service.pix;
 
 import com.finkin.domain.exception.AccountNotFoundException;
 import com.finkin.domain.model.transaction.TransactionModel;
-import com.finkin.domain.port.in.IIssueReceiptUseCase;
-import com.finkin.domain.port.out.ITransactionRepository;
+import com.finkin.domain.port.input.IIssueReceiptUseCase;
+import com.finkin.domain.port.output.ITransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

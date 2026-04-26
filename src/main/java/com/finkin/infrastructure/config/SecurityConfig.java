@@ -1,6 +1,6 @@
 package com.finkin.infrastructure.config;
 
-import com.finkin.infrastructure.adapter.in.web.auth.JwtAuthenticationFilter;
+import com.finkin.infrastructure.adapter.input.web.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,5 @@
 package com.finkin.domain.model.account;
+import com.finkin.domain.port.input.ILimitPolicy;
 
 import java.math.BigDecimal;
 

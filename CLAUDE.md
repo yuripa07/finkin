@@ -40,10 +40,10 @@ Leia `AGENTS.md` para stack, arquitetura, convenções e endpoints.
 
 ## Padrão para novos endpoints
 
-1. Criar DTO de request/response em `infrastructure/adapter/in/web/<bounded>/dto/`
-2. Criar ou atualizar o use case interface em `domain/port/in/`
+1. Criar DTO de request/response em `infrastructure/adapter/input/web/<bounded>/dto/`
+2. Criar ou atualizar o use case interface em `domain/port/input/`
 3. Implementar o service em `application/service/<bounded>/`
-4. Criar ou atualizar o controller em `infrastructure/adapter/in/web/<bounded>/`
+4. Criar ou atualizar o controller em `infrastructure/adapter/input/web/<bounded>/`
 5. Se necessário, criar migration em `src/main/resources/db/migration/V{N}__<desc>.sql`
 6. Criar teste unitário em `src/test/java/com/finkin/domain/`
 7. Criar teste de integração em `src/test/java/com/finkin/integration/`

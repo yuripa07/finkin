@@ -1,9 +1,10 @@
 package com.finkin.application.service.customer;
+import com.finkin.domain.model.customer.enums.*;
 
 import com.finkin.domain.exception.CustomerAlreadyExistsException;
 import com.finkin.domain.model.customer.*;
-import com.finkin.domain.port.in.IRegisterCustomerUseCase;
-import com.finkin.domain.port.out.ICustomerRepository;
+import com.finkin.domain.port.input.IRegisterCustomerUseCase;
+import com.finkin.domain.port.output.ICustomerRepository;
 import com.finkin.infrastructure.config.KycProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +32,9 @@ public class RegisterCustomerService implements IRegisterCustomerUseCase {
         }
 
         // KYC mock: em dev auto-approve=true, em produção inicia como PENDING
-        KycStatus initialKyc = kycProperties.isAutoApprove()
-            ? KycStatus.APPROVED
-            : KycStatus.PENDING;
+        KycStatusEnum initialKyc = kycProperties.isAutoApprove()
+            ? KycStatusEnum.APPROVED
+            : KycStatusEnum.PENDING;
 
         var now = ZonedDateTime.now();
         var customer = CustomerModel.builder()

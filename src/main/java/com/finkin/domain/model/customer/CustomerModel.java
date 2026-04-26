@@ -1,4 +1,5 @@
 package com.finkin.domain.model.customer;
+import com.finkin.domain.model.customer.enums.KycStatusEnum;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +26,7 @@ public class CustomerModel {
     private final EmailModel email;
     private final PhoneModel phone;
 
-    private KycStatus kycStatus;
+    private KycStatusEnum kycStatus;
 
     private final ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
@@ -33,17 +34,17 @@ public class CustomerModel {
 
     /** Aprovação de KYC: transiciona status e registra timestamp de atualização. */
     public void approveKyc() {
-        this.kycStatus = KycStatus.APPROVED;
+        this.kycStatus = KycStatusEnum.APPROVED;
         this.updatedAt = ZonedDateTime.now();
     }
 
     public void rejectKyc() {
-        this.kycStatus = KycStatus.REJECTED;
+        this.kycStatus = KycStatusEnum.REJECTED;
         this.updatedAt = ZonedDateTime.now();
     }
 
     public boolean isKycApproved() {
-        return KycStatus.APPROVED.equals(kycStatus);
+        return KycStatusEnum.APPROVED.equals(kycStatus);
     }
 
     /** Soft delete: marca o customer como excluído sem remover o registro. */

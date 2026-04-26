@@ -1,4 +1,5 @@
 package com.finkin.application.service.transfer;
+import com.finkin.domain.model.transaction.enums.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +8,8 @@ import com.finkin.domain.exception.AccountNotFoundException;
 import com.finkin.domain.exception.CustomerNotFoundException;
 import com.finkin.domain.model.account.MoneyModel;
 import com.finkin.domain.model.transaction.*;
-import com.finkin.domain.port.in.IExecuteInternalTransferUseCase;
-import com.finkin.domain.port.out.*;
+import com.finkin.domain.port.input.IExecuteInternalTransferUseCase;
+import com.finkin.domain.port.output.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -65,8 +66,8 @@ public class ExecuteInternalTransferService implements IExecuteInternalTransferU
         var tx = TransactionModel.builder()
             .id(UUID.randomUUID())
             .idempotencyKey(command.idempotencyKey())
-            .type(TransactionType.TRANSFERENCIA_INTERNA)
-            .status(TransactionStatus.PENDENTE)
+            .type(TransactionTypeEnum.TRANSFERENCIA_INTERNA)
+            .status(TransactionStatusEnum.PENDENTE)
             .sourceAccountId(command.sourceAccountId())
             .targetAccountId(command.targetAccountId())
             .amount(amount)

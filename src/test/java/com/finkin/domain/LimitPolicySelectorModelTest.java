@@ -1,7 +1,7 @@
 package com.finkin.domain;
 
 import com.finkin.domain.model.account.DaytimeLimitModel;
-import com.finkin.domain.model.account.ILimitPolicy;
+import com.finkin.domain.port.input.ILimitPolicy;
 import com.finkin.domain.model.account.LimitPolicySelectorModel;
 import com.finkin.domain.model.account.NighttimeLimitModel;
 import org.junit.jupiter.api.Test;

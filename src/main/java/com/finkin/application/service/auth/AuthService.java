@@ -1,12 +1,12 @@
 package com.finkin.application.service.auth;
 
 import com.finkin.domain.exception.CustomerNotFoundException;
-import com.finkin.domain.port.in.IAuthenticateUseCase;
-import com.finkin.domain.port.in.IRegisterUserUseCase;
-import com.finkin.domain.port.out.IAccountRepository;
-import com.finkin.domain.port.out.IAuthCredentialsRepository;
-import com.finkin.domain.port.out.ICustomerRepository;
-import com.finkin.infrastructure.adapter.in.web.auth.JwtService;
+import com.finkin.domain.port.input.IAuthenticateUseCase;
+import com.finkin.domain.port.input.IRegisterUserUseCase;
+import com.finkin.domain.port.output.IAccountRepository;
+import com.finkin.domain.port.output.IAuthCredentialsRepository;
+import com.finkin.domain.port.output.ICustomerRepository;
+import com.finkin.infrastructure.adapter.input.web.auth.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;

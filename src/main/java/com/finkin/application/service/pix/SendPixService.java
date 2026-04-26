@@ -1,4 +1,5 @@
 package com.finkin.application.service.pix;
+import com.finkin.domain.model.transaction.enums.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,8 +10,8 @@ import com.finkin.domain.exception.CustomerNotFoundException;
 import com.finkin.domain.exception.PixKeyNotFoundException;
 import com.finkin.domain.model.account.MoneyModel;
 import com.finkin.domain.model.transaction.*;
-import com.finkin.domain.port.in.ISendPixUseCase;
-import com.finkin.domain.port.out.*;
+import com.finkin.domain.port.input.ISendPixUseCase;
+import com.finkin.domain.port.output.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class SendPixService implements ISendPixUseCase {
 
         var now = ZonedDateTime.now();
         var endToEndId = EndToEndIdModel.generate();
-        var txEnvio = buildTransaction(command.idempotencyKey(), TransactionType.PIX_ENVIO,
+        var txEnvio = buildTransaction(command.idempotencyKey(), TransactionTypeEnum.PIX_ENVIO,
             command.sourceAccountId(), target.getId(), amount, endToEndId, now);
         txEnvio.markProcessing();
 
@@ -79,7 +80,7 @@ public class SendPixService implements ISendPixUseCase {
 
         // Para Pix interno Finkin, gera também a transação de recebimento na conta destino
         var txRecebimento = buildTransaction(
-            UUID.randomUUID().toString(), TransactionType.PIX_RECEBIMENTO,
+            UUID.randomUUID().toString(), TransactionTypeEnum.PIX_RECEBIMENTO,
             command.sourceAccountId(), target.getId(), amount, endToEndId, now);
         txRecebimento.markProcessing();
         txRecebimento.complete();
@@ -94,14 +95,14 @@ public class SendPixService implements ISendPixUseCase {
         return savedEnvio;
     }
 
-    private TransactionModel buildTransaction(String idemKey, TransactionType type,
+    private TransactionModel buildTransaction(String idemKey, TransactionTypeEnum type,
                                           UUID sourceId, UUID targetId, MoneyModel amount,
                                           EndToEndIdModel e2eId, ZonedDateTime now) {
         return TransactionModel.builder()
             .id(UUID.randomUUID())
             .idempotencyKey(idemKey)
             .type(type)
-            .status(TransactionStatus.PENDENTE)
+            .status(TransactionStatusEnum.PENDENTE)
             .sourceAccountId(sourceId)
             .targetAccountId(targetId)
             .amount(amount)

@@ -53,19 +53,29 @@ Hexagonal (Ports & Adapters). Veja `docs/ARCHITECTURE.md` para detalhe completo.
 
 ```
 com.finkin
-├── domain/          # Regras de negócio puras — sem Spring, sem JPA
-│   ├── model/       # Entidades e Value Objects
-│   ├── port/in/     # Use case interfaces (driving ports)
-│   ├── port/out/    # Repository/external interfaces (driven ports)
-│   └── exception/   # Exceções de domínio
-├── application/     # Orquestra casos de uso — depende apenas do domain
+├── domain/                    # Regras de negócio puras — sem Spring, sem JPA
+│   ├── model/                 # Entidades e Value Objects
+│   │   ├── account/           # AccountModel, MoneyModel, AccountNumberModel...
+│   │   │   └── enums/         # AccountStatusEnum, AccountTypeEnum
+│   │   ├── customer/          # CustomerModel, CpfModel, EmailModel...
+│   │   │   └── enums/         # KycStatusEnum
+│   │   ├── pix/               # PixKeyModel
+│   │   │   └── enums/         # PixKeyTypeEnum
+│   │   └── transaction/       # TransactionModel, EndToEndIdModel
+│   │       └── enums/         # TransactionStatusEnum, TransactionTypeEnum
+│   ├── port/
+│   │   ├── input/             # Use case interfaces (driving ports) + ILimitPolicy
+│   │   └── output/            # Repository/external interfaces (driven ports)
+│   └── exception/             # Exceções de domínio
+├── application/               # Orquestra casos de uso — depende apenas do domain
 │   └── service/
-├── infrastructure/  # Adapters que conectam o domínio ao mundo externo
-│   ├── adapter/in/web/    # Controllers REST + DTOs + filtros HTTP
-│   ├── adapter/out/       # JPA, Redis, mock Pix/SPI
-│   └── config/            # Beans Spring (@Configuration)
-├── shared/          # Utilitários sem lógica de negócio
-└── stubs/           # Pacotes vazios para fase 2 (cartão, boleto, etc.)
+├── infrastructure/            # Adapters que conectam o domínio ao mundo externo
+│   ├── adapter/
+│   │   ├── input/web/         # Controllers REST + DTOs + filtros HTTP
+│   │   └── output/            # JPA, Redis, mock Pix/SPI
+│   └── config/                # Beans Spring (@Configuration)
+├── shared/                    # Utilitários sem lógica de negócio
+└── stubs/                     # Pacotes vazios para fase 2 (cartão, boleto, etc.)
 ```
 
 ## Regras de dependência entre camadas (CRÍTICO)
@@ -81,11 +91,32 @@ domain ← application ← infrastructure
 
 Se um agente sugerir ou gerar código que viole esta regra, **rejeite** a mudança.
 
+## Convenções de nomenclatura (OBRIGATÓRIO)
+
+| Tipo | Padrão | Exemplo |
+|---|---|---|
+| Interface | `INomeInterface` | `IAccountRepository`, `ILimitPolicy` |
+| Domain model (classe/VO) | `NomeModel` | `AccountModel`, `MoneyModel` |
+| Enum | `NomeEnum` | `AccountStatusEnum`, `PixKeyTypeEnum` |
+| JPA Entity | `NomeJpaEntity` | `AccountJpaEntity` |
+| JPA Repository | `INomeJpaRepository` | `IAccountJpaRepository` |
+| MapStruct Mapper | `INomeMapper` | `IAccountMapper` |
+| Repository Adapter | `NomeRepositoryAdapter` | `AccountRepositoryAdapter` |
+| Use Case Interface | `INomeUseCase` | `IOpenAccountUseCase` |
+| Service | `NomeService` | `OpenAccountService` |
+| Controller | `NomeController` | `AccountController` |
+| DTO | `NomeRequest` / `NomeResponse` | `RegisterCustomerRequest` |
+
+**Localização dos tipos:**
+- Interfaces → `domain/port/input/` ou `domain/port/output/` (nunca em `domain/model/`)
+- Enums → subpackage `enums/` dentro do pacote de domínio correspondente
+- JPA Entities/Repositories/Mappers → `infrastructure/adapter/output/persistence/<bounded>/`
+
 ## Convenções de código
 
 - **Lombok**: usado em todo o código. `@Data` em DTOs, `@Value` em VOs, `@Builder` em entidades, `@RequiredArgsConstructor` em services/controllers.
-- **MapStruct**: mappers em `infrastructure.adapter.out.persistence.<bounded>/` com sufixo `Mapper` (ex: `CustomerMapper`).
-- **Nenhuma anotação JPA no domain**: entidades de domínio são POJOs. JPA entities ficam em `infrastructure.adapter.out.persistence.<bounded>/` com sufixo `JpaEntity`.
+- **MapStruct**: mappers em `infrastructure.adapter.output.persistence.<bounded>/` com prefixo `I` (ex: `ICustomerMapper`).
+- **Nenhuma anotação JPA no domain**: entidades de domínio são POJOs. JPA entities ficam em `infrastructure.adapter.output.persistence.<bounded>/` com sufixo `JpaEntity`.
 - **Comentários**: explicar o PORQUÊ, não o QUÊ. Incluir referência a norma BCB quando aplicável.
 - **Erros**: sempre RFC 7807 (`ProblemDetail` nativo do Spring 6+).
 - **Paginação**: usar `Pageable` do Spring Data em todo endpoint de listagem.
@@ -135,9 +166,9 @@ Nunca editar uma migration existente que já foi aplicada.
 
 | Norma | Implementação |
 |---|---|
-| Resolução BCB nº 1/2020 | `LimitsProperties`, `LimitPolicy`, horário noturno 20h–6h |
+| Resolução BCB nº 1/2020 | `LimitsProperties`, `ILimitPolicy`, horário noturno 20h–6h |
 | Resolução BCB nº 6/2020 | ISPB `99999999` (fictício) em `BankConstants` |
-| Manual de Tempos Pix (ICOM-BCB) | Formato `EndToEndId` — 32 chars, prefixo E+ISPB |
+| Manual de Tempos Pix (ICOM-BCB) | Formato `EndToEndIdModel` — 32 chars, prefixo E+ISPB |
 | LGPD (Lei 13.709/2018) | `MaskingConverter` — mascaramento de CPF em logs |
 
 ## Arquivos de documentação

@@ -1,4 +1,6 @@
 package com.finkin.domain.model.transaction;
+import com.finkin.domain.model.transaction.enums.TransactionStatusEnum;
+import com.finkin.domain.model.transaction.enums.TransactionTypeEnum;
 
 import com.finkin.domain.model.account.MoneyModel;
 import lombok.Builder;
@@ -30,8 +32,8 @@ public class TransactionModel {
      */
     private final String idempotencyKey;
 
-    private final TransactionType type;
-    private TransactionStatus status;
+    private final TransactionTypeEnum type;
+    private TransactionStatusEnum status;
 
     /** Conta debitada (origem). Null apenas em PIX_RECEBIMENTO de origem externa. */
     private final UUID sourceAccountId;
@@ -57,32 +59,32 @@ public class TransactionModel {
     // ── Transições de estado ───────────────────────────────────────────────
 
     public void markProcessing() {
-        assertTransitionFrom(TransactionStatus.PENDENTE);
-        this.status = TransactionStatus.PROCESSANDO;
+        assertTransitionFrom(TransactionStatusEnum.PENDENTE);
+        this.status = TransactionStatusEnum.PROCESSANDO;
         this.updatedAt = ZonedDateTime.now();
     }
 
     public void complete() {
-        assertTransitionFrom(TransactionStatus.PROCESSANDO);
-        this.status = TransactionStatus.CONCLUIDA;
+        assertTransitionFrom(TransactionStatusEnum.PROCESSANDO);
+        this.status = TransactionStatusEnum.CONCLUIDA;
         this.executedAt = ZonedDateTime.now();
         this.updatedAt = executedAt;
     }
 
     public void fail(String reason) {
-        this.status = TransactionStatus.FALHA;
+        this.status = TransactionStatusEnum.FALHA;
         this.failureReason = reason;
         this.updatedAt = ZonedDateTime.now();
     }
 
     /** Marca como revertida (apenas registro — a reversão é uma nova transação PIX_DEVOLUCAO). */
     public void markReverted() {
-        assertTransitionFrom(TransactionStatus.CONCLUIDA);
-        this.status = TransactionStatus.REVERTIDA;
+        assertTransitionFrom(TransactionStatusEnum.CONCLUIDA);
+        this.status = TransactionStatusEnum.REVERTIDA;
         this.updatedAt = ZonedDateTime.now();
     }
 
-    private void assertTransitionFrom(TransactionStatus expected) {
+    private void assertTransitionFrom(TransactionStatusEnum expected) {
         if (!expected.equals(this.status)) {
             throw new IllegalStateException(
                 "Transição de estado inválida: %s → não esperado de %s".formatted(expected, this.status));

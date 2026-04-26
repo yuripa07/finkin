@@ -2,7 +2,7 @@ package com.finkin.application.service.transfer.validator;
 
 import com.finkin.domain.exception.AccountBlockedException;
 import com.finkin.domain.model.account.AccountModel;
-import com.finkin.domain.model.account.AccountStatus;
+import com.finkin.domain.model.account.enums.AccountStatusEnum;
 import com.finkin.domain.model.account.MoneyModel;
 import com.finkin.domain.model.customer.CustomerModel;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ public class AccountStatusValidator implements ITransactionValidator {
             throw new AccountBlockedException(source.getId());
         }
         // Destino aceita crédito se não estiver ENCERRADA
-        if (AccountStatus.ENCERRADA.equals(target.getStatus())) {
+        if (AccountStatusEnum.ENCERRADA.equals(target.getStatus())) {
             throw new AccountBlockedException(target.getId());
         }
     }
