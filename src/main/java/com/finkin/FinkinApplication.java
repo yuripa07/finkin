@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @EnableAsync — necessário para publicação assíncrona de eventos de domínio (TransactionCompletedEvent).
  */
 @SpringBootApplication
-@EnableJpaAuditing(auditorAwareRef = "auditorAware")
+@EnableJpaAuditing(auditorAwareRef = "auditorAware", dateTimeProviderRef = "dateTimeProvider")
 @ConfigurationPropertiesScan("com.finkin")
 @EnableAsync
 public class FinkinApplication {
