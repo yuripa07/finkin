@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: finkin-bank
+  profiles:
+    active: dev
+
+  # Jackson: datas como ISO-8601, sem timestamps numéricos
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+
+  # JPA — open-in-view desabilitado por padrão (Spring Boot 4 mudou default)
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          time_zone: America/Sao_Paulo
+
+  # Redis: pool de conexões Lettuce
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+
+  # Threads virtuais (Project Loom) — disponível no Java 21+ e habilitado por padrão no Spring Boot 4
+  threads:
+    virtual:
+      enabled: true
+
+# Actuator: expor apenas health e info em produção
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# OpenAPI / Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# ═══════════════════════════════════════════════════════════
+# Configurações de negócio do Finkin
+# Todas as propriedades mapeadas em @ConfigurationProperties
+# ═══════════════════════════════════════════════════════════
+finkin:
+  bank:
+    # ISPB fictício do Finkin Bank (Resolução BCB nº 6/2020 define o formato ISPB real)
+    ispb: "99999999"
+    agency: "0001"
+    name: "Finkin Bank"
+
+  limits:
+    # Limite diário de transferência — Resolução BCB nº 1/2020 (Pix)
+    transfer-day-brl: 5000.00
+    transfer-night-brl: 1000.00
+    pix-night-brl: 1000.00
+    # Horário noturno: 20h–6h (Resolução BCB nº 1/2020, Art. 20)
+    night-window-start: "20:00"
+    night-window-end: "06:00"
+
+  pix:
+    spi:
+      # Delay para simular latência do SPI externo (fase 1: mock)
+      delay-ms: 2000
+      # Taxa de falha simulada (0.0 = sempre sucesso; 0.1 = 10% de falha)
+      failure-rate: 0.0
+
+  jwt:
+    # Em produção: injetar via variável de ambiente FINKIN_JWT_SECRET
+    secret: ${FINKIN_JWT_SECRET:finkin-dev-secret-change-in-prod-must-be-long-enough-256bits}
+    ttl-minutes: 60
+
+  rate-limit:
+    public-per-minute: 100
+    transaction-per-minute: 30

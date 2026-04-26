@@ -1,0 +1,36 @@
+spring:
+  # Testes unitários rápidos: H2 in-memory, sem Flyway
+  datasource:
+    url: jdbc:h2:mem:finkin_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6370  # porta diferente para não conflitar com Redis de dev
+
+logging:
+  level:
+    com.finkin: WARN
+    org.springframework.security: WARN
+
+finkin:
+  kyc:
+    auto-approve: true
+  jwt:
+    secret: test-secret-at-least-256-bits-long-for-hmac-sha-algorithm
+    ttl-minutes: 60
+  pix:
+    spi:
+      delay-ms: 0
+      failure-rate: 0.0

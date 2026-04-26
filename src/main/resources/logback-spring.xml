@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Converter customizado para mascarar CPF nos logs
+         Por que: nunca logar dados sensíveis (BCB determina em resolução de segurança da informação).
+         CPF formatado (XXX.XXX.XXX-DV) ou numérico (11 dígitos) é substituído por ***.***.***-** -->
+    <conversionRule conversionWord="maskedMsg"
+                    converterClass="com.finkin.infrastructure.adapter.in.web.common.MaskingConverter"/>
+
+    <springProfile name="dev,test">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level [%X{correlationId}] %logger{36} - %maskedMsg%n</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <!-- Em produção: JSON estruturado (Logstash/ELK/CloudWatch)
+             Aqui usamos formato compacto; troque por logstash-logback-encoder se necessário -->
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>{"ts":"%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}","lvl":"%-5level","cid":"%X{correlationId}","logger":"%logger{36}","msg":"%maskedMsg"}%n</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="com.finkin" level="INFO"/>
+    </springProfile>
+</configuration>

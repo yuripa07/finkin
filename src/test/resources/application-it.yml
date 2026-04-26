@@ -1,0 +1,31 @@
+# Perfil de integração: PostgreSQL + Redis reais via Testcontainers
+# URLs e credenciais são injetadas via @DynamicPropertySource em AbstractIntegrationTest
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  flyway:
+    enabled: true
+    # Executa apenas V1–V5 (estrutura sem dados de seed dev)
+    target: "5"
+
+finkin:
+  kyc:
+    auto-approve: true
+  jwt:
+    secret: integration-test-secret-must-be-at-least-256-bits-long-for-hmac-sha-algorithm
+    ttl-minutes: 60
+  pix:
+    spi:
+      delay-ms: 0
+      failure-rate: 0.0
+
+logging:
+  level:
+    com.finkin: WARN
+    org.springframework.security: WARN
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN
