@@ -11,14 +11,14 @@ spring:
 
   jpa:
     hibernate:
-      # Hibernate 7: 'validate' em dev para garantir paridade com as migrations do Flyway
-      ddl-auto: validate
+      # Spring Boot 4 / Hibernate 7: Flyway owns schema management; 'none' avoids
+      # the ordering issue where Hibernate validates before Flyway migrates.
+      ddl-auto: none
     show-sql: true
 
   flyway:
     enabled: true
     locations: classpath:db/migration
-    baseline-on-migrate: true
 
 logging:
   level:

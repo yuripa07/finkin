@@ -4,10 +4,8 @@ spring:
   profiles:
     active: dev
 
-  # Jackson: datas como ISO-8601, sem timestamps numéricos
+  # Jackson 3 (Spring Boot 4): ISO-8601 é o padrão para datas via JavaTimeModule
   jackson:
-    serialization:
-      write-dates-as-timestamps: false
     deserialization:
       fail-on-unknown-properties: false
     default-property-inclusion: non_null
