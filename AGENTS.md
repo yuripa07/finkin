@@ -161,6 +161,15 @@ Nunca editar uma migration existente que já foi aplicada.
 | V4__create_transaction.sql | transactions |
 | V5__create_pix_key.sql | pix_keys |
 | V6__seed_dev.sql | (dados de dev) |
+| V7__fix_seed_password_hashes.sql | corrige hashes do V6 |
+| V8__fix_seed_account_dvs.sql | corrige dígitos verificadores do V6 |
+
+### Usuários de seed (dev)
+
+| Email | Senha | CPF | Saldo |
+|---|---|---|---|
+| alice@finkin.dev | Alice123 | 529.982.247-25 | R$ 10.000 |
+| bob@finkin.dev | Bob12345 | 111.444.777-35 | R$ 5.000 |
 
 ## Normas BCB referenciadas
 

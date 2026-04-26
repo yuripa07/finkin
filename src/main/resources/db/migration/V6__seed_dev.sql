@@ -22,8 +22,8 @@ VALUES (
     'a0000001-0000-0000-0000-000000000001',
     'alice@finkin.dev',
     -- Senha: "Alice123" hasheada com BCrypt custo 12
-    -- Para regenerar: BCrypt.encode("Alice123") com custo 12
-    '$2a$12$HcZH.gZFb3Y8FmcKHT7qWO1U0R3v3f3LMXRNqlNf8VN3A5SH3M2Vu',
+    -- Para regenerar: python3 -c "import bcrypt; print(bcrypt.hashpw(b'Alice123', bcrypt.gensalt(12)).decode())"
+    '$2b$12$znv97WPSKS5qZt2sDp260ePYomvTq8IXi46B17EcNhfxvVPCnMIkm',
     NOW()
 );
 
@@ -31,7 +31,7 @@ INSERT INTO accounts (id, customer_id, agency, account_number, account_number_dv
 VALUES (
     'b0000001-0000-0000-0000-000000000001',
     'a0000001-0000-0000-0000-000000000001',
-    '0001', '100001', 9,   -- DV calculado pelo algoritmo módulo 10
+    '0001', '100001', 7,   -- DV calculado pelo algoritmo módulo 10
     'CORRENTE', 'ATIVA',
     10000.00, 5000.00, 1000.00,
     NOW(), NOW()
@@ -67,8 +67,8 @@ VALUES (
     'c0000002-0000-0000-0000-000000000002',
     'a0000002-0000-0000-0000-000000000002',
     'bob@finkin.dev',
-    -- Senha: "Bob12345"
-    '$2a$12$HcZH.gZFb3Y8FmcKHT7qWO1U0R3v3f3LMXRNqlNf8VN3A5SH3M2Vu',
+    -- Senha: "Bob12345" hasheada com BCrypt custo 12
+    '$2b$12$UPhBjq2QWG0F/idW2lhphOnbGCH4bXk6K2YbawCbI2Sz.tQ.8234q',
     NOW()
 );
 
@@ -76,7 +76,7 @@ INSERT INTO accounts (id, customer_id, agency, account_number, account_number_dv
 VALUES (
     'b0000002-0000-0000-0000-000000000002',
     'a0000002-0000-0000-0000-000000000002',
-    '0001', '200002', 7,
+    '0001', '200002', 4,
     'CORRENTE', 'ATIVA',
     5000.00, 5000.00, 1000.00,
     NOW(), NOW()
