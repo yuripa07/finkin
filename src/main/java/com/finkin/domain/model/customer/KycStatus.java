@@ -1,7 +1,7 @@
 package com.finkin.domain.model.customer;
 
 /**
- * Status do processo KYC (Know Your Customer).
+ * Status do processo KYC (Know Your CustomerModel).
  *
  * PENDING: documentos ainda não revisados (estado inicial)
  * APPROVED: KYC aprovado — conta pode enviar e receber

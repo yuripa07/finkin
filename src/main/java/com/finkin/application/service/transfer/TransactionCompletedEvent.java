@@ -1,6 +1,6 @@
 package com.finkin.application.service.transfer;
 
-import com.finkin.domain.model.transaction.Transaction;
+import com.finkin.domain.model.transaction.TransactionModel;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -13,9 +13,9 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class TransactionCompletedEvent extends ApplicationEvent {
 
-    private final Transaction transaction;
+    private final TransactionModel transaction;
 
-    public TransactionCompletedEvent(Transaction transaction) {
+    public TransactionCompletedEvent(TransactionModel transaction) {
         super(transaction);
         this.transaction = transaction;
     }

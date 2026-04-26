@@ -1,8 +1,8 @@
 package com.finkin.infrastructure.adapter.in.web.auth;
 
-import com.finkin.domain.port.in.AuthenticateUseCase;
-import com.finkin.domain.port.in.RegisterCustomerUseCase;
-import com.finkin.domain.port.in.RegisterUserUseCase;
+import com.finkin.domain.port.in.IAuthenticateUseCase;
+import com.finkin.domain.port.in.IRegisterCustomerUseCase;
+import com.finkin.domain.port.in.IRegisterUserUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -22,9 +22,9 @@ import java.time.LocalDate;
 @Tag(name = "Autenticação", description = "Registro de customer e autenticação JWT")
 public class AuthController {
 
-    private final RegisterCustomerUseCase registerCustomerUseCase;
-    private final RegisterUserUseCase registerUserUseCase;
-    private final AuthenticateUseCase authenticateUseCase;
+    private final IRegisterCustomerUseCase registerCustomerUseCase;
+    private final IRegisterUserUseCase registerUserUseCase;
+    private final IAuthenticateUseCase authenticateUseCase;
 
     /**
      * Registro unificado: cria o customer + as credenciais de acesso em uma única chamada.
@@ -35,20 +35,20 @@ public class AuthController {
     @Operation(summary = "Registrar novo customer (PF)", description = "Cria customer e credenciais JWT. KYC auto-aprovado em dev.")
     public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         var customer = registerCustomerUseCase.register(
-            new RegisterCustomerUseCase.Command(
+            new IRegisterCustomerUseCase.Command(
                 request.cpf(), request.fullName(), request.birthDate(),
                 request.email(), request.phone()
             )
         );
 
         registerUserUseCase.register(
-            new RegisterUserUseCase.Command(customer.getId(), request.email(), request.password())
+            new IRegisterUserUseCase.Command(customer.getId(), request.email(), request.password())
         );
 
         return RegisterResponse.builder()
             .customerId(customer.getId().toString())
             .kycStatus(customer.getKycStatus().name())
-            .message("Customer registrado com sucesso. Use /auth/login para obter o token JWT.")
+            .message("CustomerModel registrado com sucesso. Use /auth/login para obter o token JWT.")
             .build();
     }
 
@@ -56,7 +56,7 @@ public class AuthController {
     @Operation(summary = "Login", description = "Retorna JWT para uso nos demais endpoints.")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         String token = authenticateUseCase.authenticate(
-            new AuthenticateUseCase.Command(request.email(), request.password())
+            new IAuthenticateUseCase.Command(request.email(), request.password())
         );
         return new LoginResponse(token, "Bearer");
     }

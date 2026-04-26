@@ -8,6 +8,6 @@ import java.util.UUID;
  */
 public class KycNotApprovedException extends DomainException {
     public KycNotApprovedException(UUID customerId) {
-        super("Customer %s não possui KYC aprovado. Conta pode apenas receber até aprovação.".formatted(customerId));
+        super("CustomerModel %s não possui KYC aprovado. Conta pode apenas receber até aprovação.".formatted(customerId));
     }
 }

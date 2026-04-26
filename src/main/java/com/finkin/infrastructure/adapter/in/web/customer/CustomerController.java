@@ -1,8 +1,8 @@
 package com.finkin.infrastructure.adapter.in.web.customer;
 
-import com.finkin.domain.model.customer.Customer;
-import com.finkin.domain.port.in.RegisterCustomerUseCase;
-import com.finkin.domain.port.out.CustomerRepository;
+import com.finkin.domain.model.customer.CustomerModel;
+import com.finkin.domain.port.in.IRegisterCustomerUseCase;
+import com.finkin.domain.port.out.ICustomerRepository;
 import com.finkin.domain.exception.CustomerNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -20,7 +20,7 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 public class CustomerController {
 
-    private final CustomerRepository customerRepository;
+    private final ICustomerRepository customerRepository;
 
     @GetMapping("/me")
     @Operation(summary = "Dados do customer logado")
@@ -31,7 +31,7 @@ public class CustomerController {
         return toResponse(customer);
     }
 
-    private CustomerResponse toResponse(Customer c) {
+    private CustomerResponse toResponse(CustomerModel c) {
         return new CustomerResponse(
             c.getId().toString(),
             c.getCpf().formatted(),

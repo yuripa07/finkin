@@ -7,9 +7,9 @@ import com.finkin.application.service.transfer.validator.*;
 import com.finkin.domain.exception.AccountNotFoundException;
 import com.finkin.domain.exception.CustomerNotFoundException;
 import com.finkin.domain.exception.PixKeyNotFoundException;
-import com.finkin.domain.model.account.Money;
+import com.finkin.domain.model.account.MoneyModel;
 import com.finkin.domain.model.transaction.*;
-import com.finkin.domain.port.in.SendPixUseCase;
+import com.finkin.domain.port.in.ISendPixUseCase;
 import com.finkin.domain.port.out.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,15 +23,15 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SendPixService implements SendPixUseCase {
+public class SendPixService implements ISendPixUseCase {
 
-    private final AccountRepository accountRepository;
-    private final CustomerRepository customerRepository;
-    private final PixKeyRepository pixKeyRepository;
-    private final TransactionRepository transactionRepository;
-    private final IdempotencyStore idempotencyStore;
-    private final DomainEventPublisher eventPublisher;
-    private final ExternalPixGateway externalPixGateway;
+    private final IAccountRepository accountRepository;
+    private final ICustomerRepository customerRepository;
+    private final IPixKeyRepository pixKeyRepository;
+    private final ITransactionRepository transactionRepository;
+    private final IIdempotencyStore idempotencyStore;
+    private final IDomainEventPublisher eventPublisher;
+    private final IExternalPixGateway externalPixGateway;
     private final ObjectMapper objectMapper;
 
     private final KycValidator kycValidator;
@@ -41,7 +41,7 @@ public class SendPixService implements SendPixUseCase {
 
     @Override
     @Transactional
-    public Transaction send(Command command) {
+    public TransactionModel send(Command command) {
         // Idempotência
         var cached = idempotencyStore.get(command.idempotencyKey());
         if (cached.isPresent()) {
@@ -52,7 +52,7 @@ public class SendPixService implements SendPixUseCase {
             .orElseThrow(() -> new AccountNotFoundException(command.sourceAccountId()));
         var sourceOwner = customerRepository.findById(source.getCustomerId())
             .orElseThrow(() -> new CustomerNotFoundException(source.getCustomerId()));
-        var amount = Money.of(command.amount());
+        var amount = MoneyModel.of(command.amount());
 
         // Resolver a chave Pix para encontrar a conta destino
         var pixKey = pixKeyRepository.findByKeyValue(command.targetKeyValue())
@@ -66,7 +66,7 @@ public class SendPixService implements SendPixUseCase {
             .forEach(v -> v.validate(source, target, sourceOwner, amount));
 
         var now = ZonedDateTime.now();
-        var endToEndId = EndToEndId.generate();
+        var endToEndId = EndToEndIdModel.generate();
         var txEnvio = buildTransaction(command.idempotencyKey(), TransactionType.PIX_ENVIO,
             command.sourceAccountId(), target.getId(), amount, endToEndId, now);
         txEnvio.markProcessing();
@@ -94,10 +94,10 @@ public class SendPixService implements SendPixUseCase {
         return savedEnvio;
     }
 
-    private Transaction buildTransaction(String idemKey, TransactionType type,
-                                          UUID sourceId, UUID targetId, Money amount,
-                                          EndToEndId e2eId, ZonedDateTime now) {
-        return Transaction.builder()
+    private TransactionModel buildTransaction(String idemKey, TransactionType type,
+                                          UUID sourceId, UUID targetId, MoneyModel amount,
+                                          EndToEndIdModel e2eId, ZonedDateTime now) {
+        return TransactionModel.builder()
             .id(UUID.randomUUID())
             .idempotencyKey(idemKey)
             .type(type)
@@ -111,13 +111,13 @@ public class SendPixService implements SendPixUseCase {
             .build();
     }
 
-    private String serialize(Transaction tx) {
+    private String serialize(TransactionModel tx) {
         try { return objectMapper.writeValueAsString(tx); }
         catch (JsonProcessingException e) { return "{}"; }
     }
 
-    private Transaction deserialize(String json) {
-        try { return objectMapper.readValue(json, Transaction.class); }
+    private TransactionModel deserialize(String json) {
+        try { return objectMapper.readValue(json, TransactionModel.class); }
         catch (Exception e) { throw new RuntimeException("Falha ao recuperar idempotência Pix", e); }
     }
 }

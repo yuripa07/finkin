@@ -1,11 +1,11 @@
 package com.finkin.application.service.auth;
 
 import com.finkin.domain.exception.CustomerNotFoundException;
-import com.finkin.domain.port.in.AuthenticateUseCase;
-import com.finkin.domain.port.in.RegisterUserUseCase;
-import com.finkin.domain.port.out.AccountRepository;
-import com.finkin.domain.port.out.AuthCredentialsRepository;
-import com.finkin.domain.port.out.CustomerRepository;
+import com.finkin.domain.port.in.IAuthenticateUseCase;
+import com.finkin.domain.port.in.IRegisterUserUseCase;
+import com.finkin.domain.port.out.IAccountRepository;
+import com.finkin.domain.port.out.IAuthCredentialsRepository;
+import com.finkin.domain.port.out.ICustomerRepository;
 import com.finkin.infrastructure.adapter.in.web.auth.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +20,17 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthService implements RegisterUserUseCase, AuthenticateUseCase {
+public class AuthService implements IRegisterUserUseCase, IAuthenticateUseCase {
 
-    private final AuthCredentialsRepository credentialsRepository;
-    private final CustomerRepository customerRepository;
-    private final AccountRepository accountRepository;
+    private final IAuthCredentialsRepository credentialsRepository;
+    private final ICustomerRepository customerRepository;
+    private final IAccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
     @Override
     @Transactional
-    public void register(RegisterUserUseCase.Command command) {
+    public void register(IRegisterUserUseCase.Command command) {
         // Confirmar que o customer existe antes de criar credenciais
         customerRepository.findById(command.customerId())
             .orElseThrow(() -> new CustomerNotFoundException(command.customerId()));
@@ -41,7 +41,7 @@ public class AuthService implements RegisterUserUseCase, AuthenticateUseCase {
     }
 
     @Override
-    public String authenticate(AuthenticateUseCase.Command command) {
+    public String authenticate(IAuthenticateUseCase.Command command) {
         var credentials = credentialsRepository.findByEmail(command.email())
             .orElseThrow(() -> new BadCredentialsException("Credenciais inválidas"));
 

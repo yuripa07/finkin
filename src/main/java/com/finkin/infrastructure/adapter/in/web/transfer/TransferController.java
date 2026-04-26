@@ -1,7 +1,7 @@
 package com.finkin.infrastructure.adapter.in.web.transfer;
 
-import com.finkin.domain.model.transaction.Transaction;
-import com.finkin.domain.port.in.ExecuteInternalTransferUseCase;
+import com.finkin.domain.model.transaction.TransactionModel;
+import com.finkin.domain.port.in.IExecuteInternalTransferUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 public class TransferController {
 
-    private final ExecuteInternalTransferUseCase executeTransferUseCase;
+    private final IExecuteInternalTransferUseCase executeTransferUseCase;
 
     /**
      * Endpoint de transferência interna.
@@ -44,7 +44,7 @@ public class TransferController {
             @Valid @RequestBody TransferRequest request) {
 
         var tx = executeTransferUseCase.execute(
-            new ExecuteInternalTransferUseCase.Command(
+            new IExecuteInternalTransferUseCase.Command(
                 idempotencyKey,
                 request.sourceAccountId(),
                 request.targetAccountId(),
@@ -56,7 +56,7 @@ public class TransferController {
         return toResponse(tx);
     }
 
-    private TransferResponse toResponse(Transaction tx) {
+    private TransferResponse toResponse(TransactionModel tx) {
         return new TransferResponse(
             tx.getId().toString(),
             tx.getStatus().name(),

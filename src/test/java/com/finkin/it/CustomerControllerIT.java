@@ -33,7 +33,7 @@ class CustomerControllerIT extends AbstractIntegrationTest {
     void register_deve_criar_customer_e_retornar_201() {
         var body = Map.of(
             "cpf", CPF,
-            "fullName", "Customer IT",
+            "fullName", "CustomerModel IT",
             "birthDate", "1995-03-10",
             "email", EMAIL,
             "phone", PHONE,
@@ -70,7 +70,7 @@ class CustomerControllerIT extends AbstractIntegrationTest {
     void register_com_cpf_duplicado_deve_retornar_409() {
         var body = Map.of(
             "cpf", CPF,            // mesmo CPF do teste 1
-            "fullName", "Outro Customer",
+            "fullName", "Outro CustomerModel",
             "birthDate", "1990-01-01",
             "email", "outro@test.dev", // email diferente, mas CPF igual
             "phone", "+5511988880099",
@@ -107,7 +107,7 @@ class CustomerControllerIT extends AbstractIntegrationTest {
         // Bean Validation rejeita antes de chegar ao domínio
         var resp = post("/auth/register", body, Map.class);
 
-        // Pode ser 400 (Bean Validation) ou 422 (DomainException do Cpf VO)
+        // Pode ser 400 (Bean Validation) ou 422 (DomainException do CpfModel VO)
         assertThat(resp.getStatusCode().value()).isIn(400, 422);
     }
 }

@@ -2,8 +2,8 @@ package com.finkin.application.service.customer;
 
 import com.finkin.domain.exception.CustomerAlreadyExistsException;
 import com.finkin.domain.model.customer.*;
-import com.finkin.domain.port.in.RegisterCustomerUseCase;
-import com.finkin.domain.port.out.CustomerRepository;
+import com.finkin.domain.port.in.IRegisterCustomerUseCase;
+import com.finkin.domain.port.out.ICustomerRepository;
 import com.finkin.infrastructure.config.KycProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,15 +16,15 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RegisterCustomerService implements RegisterCustomerUseCase {
+public class RegisterCustomerService implements IRegisterCustomerUseCase {
 
-    private final CustomerRepository customerRepository;
+    private final ICustomerRepository customerRepository;
     private final KycProperties kycProperties;
 
     @Override
     @Transactional
-    public Customer register(Command command) {
-        var cpf = new Cpf(command.cpf());
+    public CustomerModel register(Command command) {
+        var cpf = new CpfModel(command.cpf());
 
         if (customerRepository.existsByCpf(cpf)) {
             throw new CustomerAlreadyExistsException(command.cpf());
@@ -36,20 +36,20 @@ public class RegisterCustomerService implements RegisterCustomerUseCase {
             : KycStatus.PENDING;
 
         var now = ZonedDateTime.now();
-        var customer = Customer.builder()
+        var customer = CustomerModel.builder()
             .id(UUID.randomUUID())
             .cpf(cpf)
             .fullName(command.fullName().strip())
             .birthDate(command.birthDate())
-            .email(new Email(command.email()))
-            .phone(new Phone(command.phone()))
+            .email(new EmailModel(command.email()))
+            .phone(new PhoneModel(command.phone()))
             .kycStatus(initialKyc)
             .createdAt(now)
             .updatedAt(now)
             .build();
 
         var saved = customerRepository.save(customer);
-        log.info("Customer registrado com KYC={}: id={}", initialKyc, saved.getId());
+        log.info("CustomerModel registrado com KYC={}: id={}", initialKyc, saved.getId());
         return saved;
     }
 }

@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finkin.application.service.transfer.validator.*;
 import com.finkin.domain.exception.AccountNotFoundException;
 import com.finkin.domain.exception.CustomerNotFoundException;
-import com.finkin.domain.model.account.Money;
+import com.finkin.domain.model.account.MoneyModel;
 import com.finkin.domain.model.transaction.*;
-import com.finkin.domain.port.in.ExecuteInternalTransferUseCase;
+import com.finkin.domain.port.in.IExecuteInternalTransferUseCase;
 import com.finkin.domain.port.out.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +21,13 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExecuteInternalTransferService implements ExecuteInternalTransferUseCase {
+public class ExecuteInternalTransferService implements IExecuteInternalTransferUseCase {
 
-    private final AccountRepository accountRepository;
-    private final CustomerRepository customerRepository;
-    private final TransactionRepository transactionRepository;
-    private final IdempotencyStore idempotencyStore;
-    private final DomainEventPublisher eventPublisher;
+    private final IAccountRepository accountRepository;
+    private final ICustomerRepository customerRepository;
+    private final ITransactionRepository transactionRepository;
+    private final IIdempotencyStore idempotencyStore;
+    private final IDomainEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
 
     // Chain of Responsibility: ordem importa — KYC antes de status, status antes de saldo
@@ -38,7 +38,7 @@ public class ExecuteInternalTransferService implements ExecuteInternalTransferUs
 
     @Override
     @Transactional
-    public Transaction execute(Command command) {
+    public TransactionModel execute(Command command) {
         // ── 1. Idempotência: retorna resultado anterior se já processado ──────
         var cached = idempotencyStore.get(command.idempotencyKey());
         if (cached.isPresent()) {
@@ -54,7 +54,7 @@ public class ExecuteInternalTransferService implements ExecuteInternalTransferUs
         var sourceOwner = customerRepository.findById(source.getCustomerId())
             .orElseThrow(() -> new CustomerNotFoundException(source.getCustomerId()));
 
-        var amount = Money.of(command.amount());
+        var amount = MoneyModel.of(command.amount());
 
         // ── 3. Validações em cadeia (Chain of Responsibility) ────────────────
         List.of(kycValidator, accountStatusValidator, balanceValidator, limitValidator)
@@ -62,7 +62,7 @@ public class ExecuteInternalTransferService implements ExecuteInternalTransferUs
 
         // ── 4. Criar transação PENDENTE ───────────────────────────────────────
         var now = ZonedDateTime.now();
-        var tx = Transaction.builder()
+        var tx = TransactionModel.builder()
             .id(UUID.randomUUID())
             .idempotencyKey(command.idempotencyKey())
             .type(TransactionType.TRANSFERENCIA_INTERNA)
@@ -70,7 +70,7 @@ public class ExecuteInternalTransferService implements ExecuteInternalTransferUs
             .sourceAccountId(command.sourceAccountId())
             .targetAccountId(command.targetAccountId())
             .amount(amount)
-            .endToEndId(EndToEndId.generate())
+            .endToEndId(EndToEndIdModel.generate())
             .createdAt(now)
             .updatedAt(now)
             .build();
@@ -97,7 +97,7 @@ public class ExecuteInternalTransferService implements ExecuteInternalTransferUs
         return saved;
     }
 
-    private String serialize(Transaction tx) {
+    private String serialize(TransactionModel tx) {
         try {
             return objectMapper.writeValueAsString(tx);
         } catch (JsonProcessingException e) {
@@ -106,9 +106,9 @@ public class ExecuteInternalTransferService implements ExecuteInternalTransferUs
         }
     }
 
-    private Transaction deserialize(String json) {
+    private TransactionModel deserialize(String json) {
         try {
-            return objectMapper.readValue(json, Transaction.class);
+            return objectMapper.readValue(json, TransactionModel.class);
         } catch (Exception e) {
             log.error("Erro ao deserializar transação do Redis", e);
             throw new RuntimeException("Falha ao recuperar resultado de idempotência", e);

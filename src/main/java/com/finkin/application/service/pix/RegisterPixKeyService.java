@@ -1,11 +1,11 @@
 package com.finkin.application.service.pix;
 
 import com.finkin.domain.exception.AccountNotFoundException;
-import com.finkin.domain.model.pix.PixKey;
+import com.finkin.domain.model.pix.PixKeyModel;
 import com.finkin.domain.model.pix.PixKeyType;
-import com.finkin.domain.port.in.RegisterPixKeyUseCase;
-import com.finkin.domain.port.out.AccountRepository;
-import com.finkin.domain.port.out.PixKeyRepository;
+import com.finkin.domain.port.in.IRegisterPixKeyUseCase;
+import com.finkin.domain.port.out.IAccountRepository;
+import com.finkin.domain.port.out.IPixKeyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,20 +14,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RegisterPixKeyService implements RegisterPixKeyUseCase {
+public class RegisterPixKeyService implements IRegisterPixKeyUseCase {
 
-    private final PixKeyRepository pixKeyRepository;
-    private final AccountRepository accountRepository;
+    private final IPixKeyRepository pixKeyRepository;
+    private final IAccountRepository accountRepository;
 
     @Override
     @Transactional
-    public PixKey register(Command command) {
+    public PixKeyModel register(Command command) {
         accountRepository.findById(command.accountId())
             .orElseThrow(() -> new AccountNotFoundException(command.accountId()));
 
-        PixKey key = command.keyType() == PixKeyType.RANDOM
-            ? PixKey.createRandom(command.accountId())
-            : PixKey.create(command.accountId(), command.keyType(), command.keyValue());
+        PixKeyModel key = command.keyType() == PixKeyType.RANDOM
+            ? PixKeyModel.createRandom(command.accountId())
+            : PixKeyModel.create(command.accountId(), command.keyType(), command.keyValue());
 
         if (pixKeyRepository.existsByKeyValue(key.getKeyValue())) {
             throw new com.finkin.domain.exception.DomainException(

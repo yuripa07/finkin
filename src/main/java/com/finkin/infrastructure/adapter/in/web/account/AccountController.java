@@ -1,9 +1,9 @@
 package com.finkin.infrastructure.adapter.in.web.account;
 
-import com.finkin.domain.model.account.Account;
+import com.finkin.domain.model.account.AccountModel;
 import com.finkin.domain.model.account.AccountType;
 import com.finkin.domain.model.pix.PixKeyType;
-import com.finkin.domain.model.transaction.Transaction;
+import com.finkin.domain.model.transaction.TransactionModel;
 import com.finkin.domain.port.in.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,10 +30,10 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 public class AccountController {
 
-    private final OpenAccountUseCase openAccountUseCase;
-    private final GetBalanceUseCase getBalanceUseCase;
-    private final GetStatementUseCase getStatementUseCase;
-    private final RegisterPixKeyUseCase registerPixKeyUseCase;
+    private final IOpenAccountUseCase openAccountUseCase;
+    private final IGetBalanceUseCase getBalanceUseCase;
+    private final IGetStatementUseCase getStatementUseCase;
+    private final IRegisterPixKeyUseCase registerPixKeyUseCase;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -42,7 +42,7 @@ public class AccountController {
                                        Authentication auth) {
         UUID customerId = UUID.fromString(auth.getName());
         var account = openAccountUseCase.open(
-            new OpenAccountUseCase.Command(customerId, request.type())
+            new IOpenAccountUseCase.Command(customerId, request.type())
         );
         return toResponse(account);
     }
@@ -68,14 +68,14 @@ public class AccountController {
     public PixKeyResponse registerPixKey(@PathVariable UUID id,
                                          @Valid @RequestBody PixKeyRequest request) {
         var key = registerPixKeyUseCase.register(
-            new RegisterPixKeyUseCase.Command(id, request.keyType(), request.keyValue())
+            new IRegisterPixKeyUseCase.Command(id, request.keyType(), request.keyValue())
         );
         return new PixKeyResponse(key.getId().toString(), key.getKeyType().name(), key.getKeyValue());
     }
 
     // ── Mappers locais ────────────────────────────────────────────────────
 
-    private AccountResponse toResponse(Account a) {
+    private AccountResponse toResponse(AccountModel a) {
         return new AccountResponse(
             a.getId().toString(),
             a.getAgency() + "/" + a.getNumber().formatted(),
@@ -86,7 +86,7 @@ public class AccountController {
         );
     }
 
-    private StatementItem toStatementItem(Transaction t) {
+    private StatementItem toStatementItem(TransactionModel t) {
         return new StatementItem(
             t.getId().toString(),
             t.getType().name(),

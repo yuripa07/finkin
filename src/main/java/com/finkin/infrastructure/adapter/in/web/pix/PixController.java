@@ -1,9 +1,9 @@
 package com.finkin.infrastructure.adapter.in.web.pix;
 
 import com.finkin.domain.model.pix.PixKeyType;
-import com.finkin.domain.model.transaction.Transaction;
-import com.finkin.domain.port.in.IssueReceiptUseCase;
-import com.finkin.domain.port.in.SendPixUseCase;
+import com.finkin.domain.model.transaction.TransactionModel;
+import com.finkin.domain.port.in.IIssueReceiptUseCase;
+import com.finkin.domain.port.in.ISendPixUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,8 +27,8 @@ import java.util.UUID;
 @SecurityRequirement(name = "bearerAuth")
 public class PixController {
 
-    private final SendPixUseCase sendPixUseCase;
-    private final IssueReceiptUseCase issueReceiptUseCase;
+    private final ISendPixUseCase sendPixUseCase;
+    private final IIssueReceiptUseCase issueReceiptUseCase;
 
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.CREATED)
@@ -41,7 +41,7 @@ public class PixController {
             @Valid @RequestBody PixRequest request) {
 
         var tx = sendPixUseCase.send(
-            new SendPixUseCase.Command(
+            new ISendPixUseCase.Command(
                 idempotencyKey,
                 request.sourceAccountId(),
                 request.targetKeyType(),
@@ -71,7 +71,7 @@ public class PixController {
         );
     }
 
-    private PixResponse toResponse(Transaction tx) {
+    private PixResponse toResponse(TransactionModel tx) {
         return new PixResponse(
             tx.getId().toString(),
             tx.getStatus().name(),
