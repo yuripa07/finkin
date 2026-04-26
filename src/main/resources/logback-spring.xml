@@ -4,7 +4,7 @@
          Por que: nunca logar dados sensíveis (BCB determina em resolução de segurança da informação).
          CPF formatado (XXX.XXX.XXX-DV) ou numérico (11 dígitos) é substituído por ***.***.***-** -->
     <conversionRule conversionWord="maskedMsg"
-                    converterClass="com.finkin.infrastructure.adapter.in.web.common.MaskingConverter"/>
+                    converterClass="com.finkin.infrastructure.adapter.input.web.common.MaskingConverter"/>
 
     <springProfile name="dev,test">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
